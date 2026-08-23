@@ -53,7 +53,7 @@ class NikoPartnerFan(NikoDeviceEntity, FanEntity):
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         if preset_mode not in _PRESET_MODES:
-            raise ValueError(f"Niet-ondersteunde ventilatiestand: {preset_mode}")
+            raise ValueError(f"Unsupported ventilation mode: {preset_mode}")
         await self.hub.async_control_device(
             self.device.uuid, {"FanSpeed": preset_mode}
         )

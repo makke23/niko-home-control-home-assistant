@@ -145,14 +145,14 @@ class NikoClimate(NikoDeviceEntity, ClimateEntity):
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         if preset_mode not in self._attr_preset_modes:
-            raise ValueError(f"Niet-ondersteund Niko-programma: {preset_mode}")
+            raise ValueError(f"Unsupported Niko program: {preset_mode}")
         await self.hub.async_control_device(
             self.device.uuid, {"Program": preset_mode}
         )
 
     async def async_set_fan_mode(self, fan_mode: str) -> None:
         if fan_mode not in _FAN_SPEEDS:
-            raise ValueError(f"Niet-ondersteunde HVAC-ventilatorsnelheid: {fan_mode}")
+            raise ValueError(f"Unsupported HVAC fan speed: {fan_mode}")
         await self.hub.async_control_device(
             self.device.uuid, {"FanSpeed": fan_mode}
         )
@@ -169,7 +169,7 @@ class NikoClimate(NikoDeviceEntity, ClimateEntity):
                     ),
                 }
             else:
-                raise ValueError(f"Niet-ondersteunde HVAC-modus: {hvac_mode}")
+                raise ValueError(f"Unsupported HVAC mode: {hvac_mode}")
         else:
             if hvac_mode == HVACMode.OFF:
                 properties = {"Program": "Off"}
@@ -179,5 +179,5 @@ class NikoClimate(NikoDeviceEntity, ClimateEntity):
                     "Program": "Day" if current_program == "Off" else current_program or "Day"
                 }
             else:
-                raise ValueError(f"Niet-ondersteunde thermostaatmodus: {hvac_mode}")
+                raise ValueError(f"Unsupported thermostat mode: {hvac_mode}")
         await self.hub.async_control_device(self.device.uuid, properties)

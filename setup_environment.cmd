@@ -15,5 +15,5 @@ if errorlevel 1 exit /b 1
 if not exist debug_config.json copy debug_config.example.json debug_config.json >nul
 
 echo.
-echo Omgeving klaar. Vul nu debug_config.json in en start debug_niko_connection.py.
+echo Environment ready. Complete debug_config.json and start debug_niko_connection.py.
 endlocal

@@ -45,7 +45,7 @@ async def _print_measurement_summary(
             properties = ("<request-failed>",)
         groups[(device.model or "-", device.device_type or "-", properties)] += 1
 
-    print("REST-meetoverzicht (zonder namen, UUID's of waarden):\n")
+    print("REST measurement summary (without names, UUIDs, or values):\n")
     for (model, device_type, properties), count in sorted(groups.items()):
         print(f"{model} / {device_type}: {count} | properties={list(properties) or '-'}")
 
@@ -91,15 +91,15 @@ async def _print_history_probe(
                 failures[(device.model, device.device_type, redacted)] += 1
                 continue
             years = sorted({item.timestamp[:4] for item in history})
-            print("Historische REST-probe (zonder UUID's of waarden):")
+            print("Historical REST probe (without UUIDs or values):")
             print(f"model/type={device.model}/{device.device_type}")
             print(f"property={property_name}")
-            print(f"intervallen={len(history)}")
-            print(f"periode={years[0] if years else '-'}..{years[-1] if years else '-'}")
+            print(f"interval_count={len(history)}")
+            print(f"period={years[0] if years else '-'}..{years[-1] if years else '-'}")
             return
-    print("Historische REST-probe: geen werkende meetreeks gevonden.")
+    print("Historical REST probe: no working measurement series found.")
     for (model, device_type, error), count in sorted(failures.items()):
-        print(f"{model}/{device_type}: {count} mislukt ({error})")
+        print(f"{model}/{device_type}: {count} failed ({error})")
 
 
 async def _print_history_levels_probe(
@@ -135,27 +135,27 @@ async def _print_history_levels_probe(
         now = datetime.now().astimezone()
         next_year = datetime(now.year + 1, 1, 1)
         probes = (
-            ("year", "volledig", datetime(2000, 1, 1), next_year),
+            ("year", "complete", datetime(2000, 1, 1), next_year),
             (
                 "month",
-                "volledig",
+                "complete",
                 datetime(max(2000, now.year - 5), 1, 1),
                 next_year,
             ),
             (
                 "day",
-                "vorig-jaar-proefblok",
+                "previous-year-sample",
                 datetime(now.year - 1, 1, 1),
                 datetime(now.year - 1, 1, 1) + timedelta(days=90),
             ),
             (
                 "day",
-                "januari-huidig-jaar",
+                "current-year-january",
                 datetime(now.year, 1, 1),
                 datetime(now.year, 2, 1),
             ),
         )
-        print("Historische aggregatieniveaus (zonder UUID's of waarden):")
+        print("Historical aggregation levels (without UUIDs or values):")
         print(f"model/type={device.model}/{device.device_type}")
         print(f"property={property_name}")
         for interval, label, start, end in probes:
@@ -171,17 +171,17 @@ async def _print_history_levels_probe(
                 nonzero = sum(item.value != 0 for item in result)
                 units = sorted({item.unit for item in result if item.unit})
                 print(
-                    f"interval={interval} blok={label} "
-                    f"aantal={len(timestamps)} niet-nul={nonzero} "
-                    f"eenheid={units or '-'} "
-                    f"van={timestamps[0] if timestamps else '-'} "
-                    f"tot={timestamps[-1] if timestamps else '-'}"
+                    f"interval={interval} block={label} "
+                    f"count={len(timestamps)} nonzero={nonzero} "
+                    f"unit={units or '-'} "
+                    f"from={timestamps[0] if timestamps else '-'} "
+                    f"to={timestamps[-1] if timestamps else '-'}"
                 )
             except NikoMeasurementsError as exc:
                 redacted = str(exc).replace(device.uuid, "<uuid>")
-                print(f"interval={interval} mislukt={redacted}")
+                print(f"interval={interval} failed={redacted}")
         return
-    print("Historische aggregatieniveaus: geen geschikte meetreeks gevonden.")
+    print("Historical aggregation levels: no suitable measurement series found.")
 
 
 def _print_capability_summary(devices: dict[str, NikoDevice]) -> None:
@@ -191,7 +191,7 @@ def _print_capability_summary(devices: dict[str, NikoDevice]) -> None:
     for device in devices.values():
         groups[(device.model or "-", device.device_type or "-")].append(device)
 
-    print("Capability-overzicht (zonder namen of UUID's):\n")
+    print("Capability summary (without names or UUIDs):\n")
     for (model, device_type), grouped_devices in sorted(groups.items()):
         properties = sorted(
             {
@@ -238,7 +238,7 @@ def _print_capability_summary(devices: dict[str, NikoDevice]) -> None:
         )
         relationships[relation] += 1
 
-    print("\nGedeelde Identifier-relaties:")
+    print("\nShared identifier relationships:")
     if not relationships:
         print("-")
     for relation, count in sorted(relationships.items()):
@@ -256,7 +256,7 @@ async def main(
 ) -> None:
     if not CONFIG_PATH.exists():
         raise FileNotFoundError(
-            "debug_config.json ontbreekt. Kopieer debug_config.example.json en vul je token in."
+            "debug_config.json is missing. Copy debug_config.example.json and add your token."
         )
 
     config = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
@@ -270,7 +270,7 @@ async def main(
 
     try:
         devices = await client.async_start()
-        print(f"Verbonden. devices.list bevat {len(devices)} apparaten.\n")
+        print(f"Connected. devices.list contains {len(devices)} devices.\n")
         if history_levels:
             await _print_history_levels_probe(
                 devices, config["host"], config["token"]
@@ -282,7 +282,7 @@ async def main(
             groups: dict[tuple[str, str], int] = defaultdict(int)
             for item in items:
                 groups[(item.notification_type, item.status or "-")] += 1
-            print("Meldingsoverzicht (zonder tekst, tijdstip of UUID):\n")
+            print("Notification summary (without text, timestamps, or UUIDs):\n")
             if not groups:
                 print("-")
             for (notification_type, status), count in sorted(groups.items()):
@@ -299,7 +299,7 @@ async def main(
                 )
         if once:
             return
-        print("\nDruk Ctrl+C om de debugverbinding te sluiten.")
+        print("\nPress Ctrl+C to close the debug connection.")
         while True:
             await asyncio.sleep(1)
     finally:
@@ -311,32 +311,32 @@ if __name__ == "__main__":
     parser.add_argument(
         "--history-levels",
         action="store_true",
-        help="toon geanonimiseerd welke historische aggregaties beschikbaar zijn",
+        help="show which historical aggregation levels are available, without identifiers",
     )
     parser.add_argument(
         "--history",
         action="store_true",
-        help="controleer geanonimiseerd de historische REST-meetendpoint",
+        help="probe the historical REST measurement endpoint without identifiers",
     )
     parser.add_argument(
         "--notifications",
         action="store_true",
-        help="toon een geanonimiseerd overzicht van Niko-meldingen",
+        help="show an anonymized summary of Niko notifications",
     )
     parser.add_argument(
         "--measurements",
         action="store_true",
-        help="toon een geanonimiseerd overzicht van lokale REST-metingen",
+        help="show an anonymized summary of local REST measurements",
     )
     parser.add_argument(
         "--capabilities",
         action="store_true",
-        help="toon alleen een geanonimiseerde capability-samenvatting",
+        help="show only an anonymized capability summary",
     )
     parser.add_argument(
         "--once",
         action="store_true",
-        help="sluit af zodra devices.list verwerkt is",
+        help="exit after devices.list has been processed",
     )
     arguments = parser.parse_args()
     try:

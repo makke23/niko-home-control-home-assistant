@@ -43,7 +43,7 @@ class NikoFanSpeedSelect(NikoDeviceEntity, SelectEntity):
     def __init__(self, hub: NikoHub, device: NikoDevice) -> None:
         super().__init__(hub, device)
         self._attr_unique_id = f"{device.uuid}_fan_speed"
-        self._attr_name = f"{device.name} snelheid"
+        self._attr_name = f"{device.name} speed"
 
     @property
     def current_option(self) -> str | None:
@@ -52,7 +52,7 @@ class NikoFanSpeedSelect(NikoDeviceEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> None:
         if option not in self._attr_options:
-            raise ValueError(f"Niet-ondersteunde Niko-ventilatorsnelheid: {option}")
+            raise ValueError(f"Unsupported Niko fan speed: {option}")
         await self.hub.async_control_device(
             self.device.uuid, {"FanSpeed": option}
         )
@@ -67,7 +67,7 @@ class NikoChargingModeSelect(NikoDeviceEntity, SelectEntity):
     def __init__(self, hub: NikoHub, device: NikoDevice) -> None:
         super().__init__(hub, device)
         self._attr_unique_id = f"{device.uuid}_charging_mode"
-        self._attr_name = f"{device.name} laadmodus"
+        self._attr_name = f"{device.name} charging mode"
 
     @property
     def current_option(self) -> str | None:
@@ -76,7 +76,7 @@ class NikoChargingModeSelect(NikoDeviceEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> None:
         if option not in self._attr_options:
-            raise ValueError(f"Niet-ondersteunde laadmodus: {option}")
+            raise ValueError(f"Unsupported charging mode: {option}")
         await self.hub.async_control_device(
             self.device.uuid, {"Chargingmode": option}
         )

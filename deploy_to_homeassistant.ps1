@@ -12,27 +12,27 @@ $destination = Join-Path `
     $HomeAssistantConfig `
     "custom_components\niko_home_control_local"
 
-Write-Host "Bron:"
+Write-Host "Source:"
 Write-Host "  $source"
 
-Write-Host "Bestemming:"
+Write-Host "Destination:"
 Write-Host "  $destination"
 
 if (-not (Test-Path -LiteralPath $source)) {
-    throw "De bronmap bestaat niet: $source"
+    throw "The source directory does not exist: $source"
 }
 
 if (-not (Test-Path -LiteralPath $HomeAssistantConfig)) {
     throw @"
-De Home Assistant Samba-share is niet bereikbaar:
+The Home Assistant Samba share is not accessible:
 
 $HomeAssistantConfig
 
-Open eerst in Windows Verkenner:
+First open this path in Windows Explorer:
 \\homeassistant\config
 
-Meld je daar aan met de gebruikersgegevens van de Samba Share-app.
-Gebruik eventueel het IP-adres van Home Assistant in plaats van 'homeassistant'.
+Sign in with the credentials configured in the Samba Share app.
+If necessary, use the Home Assistant IP address instead of 'homeassistant'.
 "@
 }
 
@@ -46,7 +46,7 @@ New-Item `
     -Path $customComponentsDirectory |
     Out-Null
 
-Write-Host "Integratie kopiëren..."
+Write-Host "Copying integration..."
 
 $destinationManifestBefore = Join-Path $destination "manifest.json"
 $previousDestinationVersion = $null
@@ -71,15 +71,15 @@ robocopy `
 
 $robocopyExitCode = $LASTEXITCODE
 
-# Robocopy-codes 0 t/m 7 zijn succesvol.
+# Robocopy exit codes 0 through 7 indicate success.
 if ($robocopyExitCode -gt 7) {
-    throw "Robocopy is mislukt met foutcode $robocopyExitCode"
+    throw "Robocopy failed with exit code $robocopyExitCode"
 }
 
 $sourceManifest = Join-Path $source "manifest.json"
 $destinationManifest = Join-Path $destination "manifest.json"
 if (-not (Test-Path -LiteralPath $destinationManifest)) {
-    throw "Deploycontrole mislukt: manifest ontbreekt in $destinationManifest"
+    throw "Deployment validation failed: manifest is missing from $destinationManifest"
 }
 
 $sourceVersion = (Get-Content -LiteralPath $sourceManifest -Raw | ConvertFrom-Json).version
@@ -88,26 +88,26 @@ $destinationVersion = (
 ).version
 if ($sourceVersion -ne $destinationVersion) {
     throw @"
-Deploycontrole mislukt: de versies komen niet overeen.
-Bron: $sourceVersion
-Doel: $destinationVersion
+Deployment validation failed: the versions do not match.
+Source: $sourceVersion
+Destination: $destinationVersion
 "@
 }
 
-Write-Host "Niko Energie-dashboard installeren..."
+Write-Host "Installing the Niko Energy dashboard..."
 & (Join-Path $PSScriptRoot "install_energy_dashboard.ps1") `
     -HomeAssistantConfig $HomeAssistantConfig
 
 Write-Host ""
-Write-Host "Deploy geslaagd."
-Write-Host "Gecontroleerde versie: $destinationVersion"
-Write-Host "Integratie geplaatst in:"
+Write-Host "Deployment completed successfully."
+Write-Host "Validated version: $destinationVersion"
+Write-Host "Integration installed in:"
 Write-Host "  $destination"
 Write-Host ""
 if ($previousDestinationVersion -eq $sourceVersion) {
-    Write-Host "Alleen dashboardbestanden zijn bijgewerkt."
-    Write-Host "Vernieuw het Niko Energie-dashboard; een herstart is niet nodig."
+    Write-Host "Only dashboard files were updated."
+    Write-Host "Refresh the Niko Energy dashboard; no restart is required."
 }
 else {
-    Write-Host "Controleer de configuratie en herstart Home Assistant volledig."
+    Write-Host "Validate the configuration and restart Home Assistant."
 }

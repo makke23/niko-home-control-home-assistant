@@ -26,7 +26,7 @@ def test_parse_devices_list() -> None:
                 "Devices": [
                     {
                         "Uuid": "abc",
-                        "Name": "Test lamp",
+            "Name": "Test light",
                         "Model": "light",
                         "Type": "action",
                         "Properties": [{"Status": "On"}],
@@ -47,7 +47,7 @@ def test_parse_devices_list() -> None:
     devices = parse_devices_list(payload)
     assert list(devices) == ["abc"]
     device = devices["abc"]
-    assert device.name == "Test lamp"
+    assert device.name == "Test light"
     assert device.properties["Status"] == "On"
     assert device.property_definitions["Status"].has_status is True
     assert device.property_definitions["Status"].can_control is True

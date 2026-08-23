@@ -63,17 +63,17 @@ class NikoBinaryDescription:
 ACCUMULATION_DESCRIPTIONS = {
     description.property_name: description
     for description in (
-        NikoAccumulationDescription("ElectricalEnergy", "Energie totaal", "kWh", "energy", 1000.0),
-        NikoAccumulationDescription("ElectricalEnergyFromGrid", "Netafname totaal", "kWh", "energy", 1000.0),
-        NikoAccumulationDescription("ElectricalEnergyToGrid", "Netinjectie totaal", "kWh", "energy", 1000.0),
-        NikoAccumulationDescription("ElectricalEnergyConsumption", "Verbruik totaal", "kWh", "energy", 1000.0),
-        NikoAccumulationDescription("ElectricalEnergyProduction", "Productie totaal", "kWh", "energy", 1000.0),
-        NikoAccumulationDescription("ElectricalEnergySelfConsumption", "Zelfverbruik totaal", "kWh", "energy", 1000.0),
-        NikoAccumulationDescription("ElectricalEnergyCharged", "Batterij geladen totaal", "kWh", "energy", 1000.0),
-        NikoAccumulationDescription("ElectricalEnergyDischarged", "Batterij ontladen totaal", "kWh", "energy", 1000.0),
-        NikoAccumulationDescription("WaterVolume", "Waterverbruik totaal", "m³", "water", 1.0),
-        NikoAccumulationDescription("GasVolume", "Gasverbruik totaal", "m³", "gas", 1.0),
-        NikoAccumulationDescription("Gasvolume", "Gasverbruik totaal", "m³", "gas", 1.0),
+        NikoAccumulationDescription("ElectricalEnergy", "Total energy", "kWh", "energy", 1000.0),
+        NikoAccumulationDescription("ElectricalEnergyFromGrid", "Total grid consumption", "kWh", "energy", 1000.0),
+        NikoAccumulationDescription("ElectricalEnergyToGrid", "Total grid export", "kWh", "energy", 1000.0),
+        NikoAccumulationDescription("ElectricalEnergyConsumption", "Total consumption", "kWh", "energy", 1000.0),
+        NikoAccumulationDescription("ElectricalEnergyProduction", "Total production", "kWh", "energy", 1000.0),
+        NikoAccumulationDescription("ElectricalEnergySelfConsumption", "Total self-consumption", "kWh", "energy", 1000.0),
+        NikoAccumulationDescription("ElectricalEnergyCharged", "Total battery charge", "kWh", "energy", 1000.0),
+        NikoAccumulationDescription("ElectricalEnergyDischarged", "Total battery discharge", "kWh", "energy", 1000.0),
+        NikoAccumulationDescription("WaterVolume", "Total water consumption", "m³", "water", 1.0),
+        NikoAccumulationDescription("GasVolume", "Total gas consumption", "m³", "gas", 1.0),
+        NikoAccumulationDescription("Gasvolume", "Total gas consumption", "m³", "gas", 1.0),
     )
 }
 
@@ -82,132 +82,132 @@ SENSOR_DESCRIPTIONS = {
     description.property_name: description
     for description in (
         NikoSensorDescription(
-            "ElectricalPower", "Vermogen", "W", "power", "measurement"
+            "ElectricalPower", "Power", "W", "power", "measurement"
         ),
         NikoSensorDescription(
-            "ElectricalPower1", "Vermogen fase 1", "W", "power", "measurement"
+            "ElectricalPower1", "Phase 1 power", "W", "power", "measurement"
         ),
         NikoSensorDescription(
-            "ElectricalPower2", "Vermogen fase 2", "W", "power", "measurement"
+            "ElectricalPower2", "Phase 2 power", "W", "power", "measurement"
         ),
         NikoSensorDescription(
-            "ElectricalPower3", "Vermogen fase 3", "W", "power", "measurement"
+            "ElectricalPower3", "Phase 3 power", "W", "power", "measurement"
         ),
         NikoSensorDescription(
-            "ElectricalPowerFromGrid", "Netafname", "W", "power", "measurement"
+            "ElectricalPowerFromGrid", "Grid consumption", "W", "power", "measurement"
         ),
         NikoSensorDescription(
-            "ElectricalPowerToGrid", "Netinjectie", "W", "power", "measurement"
+            "ElectricalPowerToGrid", "Grid export", "W", "power", "measurement"
         ),
         NikoSensorDescription(
             "ElectricalPeakPowerFromGrid",
-            "Piek netafname",
+            "Peak grid consumption",
             "W",
             "power",
             "measurement",
         ),
         NikoSensorDescription(
             "ElectricalPeakPowerToGrid",
-            "Piek netinjectie",
+            "Peak grid export",
             "W",
             "power",
             "measurement",
         ),
         NikoSensorDescription(
             "ElectricalMonthlyPeakPowerFromGrid",
-            "Maandpiek",
+            "Monthly peak",
             "W",
             "power",
             "measurement",
         ),
         NikoSensorDescription(
-            "AmbientTemperature", "Temperatuur", "°C", "temperature", "measurement"
+            "AmbientTemperature", "Temperature", "°C", "temperature", "measurement"
         ),
         NikoSensorDescription(
-            "HeatIndex", "Gevoelstemperatuur", "°C", "temperature", "measurement"
+            "HeatIndex", "Feels-like temperature", "°C", "temperature", "measurement"
         ),
         NikoSensorDescription(
-            "Humidity", "Luchtvochtigheid", "%", "humidity", "measurement"
+            "Humidity", "Humidity", "%", "humidity", "measurement"
         ),
         NikoSensorDescription(
-            "OutdoorTemperature", "Buitentemperatuur", "°C", "temperature", "measurement"
+            "OutdoorTemperature", "Outdoor temperature", "°C", "temperature", "measurement"
         ),
         NikoSensorDescription(
-            "SetpointTemperature", "Doeltemperatuur", "°C", "temperature", "measurement"
+            "SetpointTemperature", "Target temperature", "°C", "temperature", "measurement"
         ),
         NikoSensorDescription(
-            "OverruleSetpoint", "Tijdelijke doeltemperatuur", "°C", "temperature", "measurement"
+            "OverruleSetpoint", "Temporary target temperature", "°C", "temperature", "measurement"
         ),
         NikoSensorDescription("CO2", "CO₂", "ppm", "carbon_dioxide", "measurement"),
         NikoSensorDescription(
             "DomesticHotWaterTemperature",
-            "Warmwatertemperatuur",
+            "Domestic hot water temperature",
             "°C",
             "temperature",
             "measurement",
         ),
         NikoSensorDescription(
-            "TargetDistance", "Doelafstand", "km", "distance", "measurement"
+            "TargetDistance", "Target distance", "km", "distance", "measurement"
         ),
         NikoSensorDescription(
-            "ReachableDistance", "Bereikbare afstand", "km", "distance", "measurement"
+            "ReachableDistance", "Reachable distance", "km", "distance", "measurement"
         ),
         NikoSensorDescription(
-            "ElectricalEnergy", "Elektrische energie", "Wh", "energy", "total"
+            "ElectricalEnergy", "Electrical energy", "Wh", "energy", "total"
         ),
         NikoSensorDescription(
-            "ElectricalEnergyCharged", "Geladen energie", "Wh", "energy", "total"
+            "ElectricalEnergyCharged", "Charged energy", "Wh", "energy", "total"
         ),
         NikoSensorDescription(
             "ElectricalEnergyDischarged",
-            "Ontladen energie",
+            "Discharged energy",
             "Wh",
             "energy",
             "total",
         ),
         NikoSensorDescription(
             "ElectricalEnergyFromGrid",
-            "Energie van het net",
+            "Energy from grid",
             "Wh",
             "energy",
             "total_increasing",
         ),
         NikoSensorDescription(
             "ElectricalEnergyToGrid",
-            "Energie naar het net",
+            "Energy to grid",
             "Wh",
             "energy",
             "total_increasing",
         ),
         NikoSensorDescription(
             "ElectricalEnergyProduction",
-            "Geproduceerde energie",
+            "Produced energy",
             "Wh",
             "energy",
             "total_increasing",
         ),
         NikoSensorDescription(
             "ElectricalEnergySelfConsumption",
-            "Zelfverbruik",
+            "Self-consumption",
             "Wh",
             "energy",
             "total_increasing",
         ),
         NikoSensorDescription(
             "ElectricalEnergyConsumption",
-            "Energieverbruik",
+            "Energy consumption",
             "Wh",
             "energy",
             "total_increasing",
         ),
         NikoSensorDescription(
-            "WaterVolume", "Waterverbruik", "m³", "water", "total_increasing"
+            "WaterVolume", "Water consumption", "m³", "water", "total_increasing"
         ),
         NikoSensorDescription(
-            "GasVolume", "Gasverbruik", "m³", "gas", "total_increasing"
+            "GasVolume", "Gas consumption", "m³", "gas", "total_increasing"
         ),
         NikoSensorDescription(
-            "Gasvolume", "Gasverbruik", "m³", "gas", "total_increasing"
+            "Gasvolume", "Gas consumption", "m³", "gas", "total_increasing"
         ),
     )
 }
@@ -218,12 +218,12 @@ ENUM_SENSOR_DESCRIPTIONS = {
     for description in (
         NikoEnumSensorDescription(
             "Chargingstatus",
-            "Laadstatus",
+            "Charging status",
             ("Active", "Inactive", "BatteryFull", "Error"),
         ),
         NikoEnumSensorDescription(
             "EVStatus",
-            "Voertuigstatus",
+            "Vehicle status",
             ("Idle", "Connected", "Charging", "Error"),
         ),
     )
@@ -403,7 +403,7 @@ def discover_binary_statuses(
                 (
                     device,
                     NikoBinaryDescription(
-                        "TargetReached", "Laaddoel bereikt", None, False
+                        "TargetReached", "Charging target reached", None, False
                     ),
                 )
             )
@@ -423,7 +423,7 @@ def discover_binary_statuses(
                 (
                     device,
                     NikoBinaryDescription(
-                        "AllStarted", "Alle deelnemers actief", None, True
+                        "AllStarted", "All participants active", None, True
                     ),
                 )
             )
@@ -431,23 +431,23 @@ def discover_binary_statuses(
             discovered.append(
                 (
                     device,
-                    NikoBinaryDescription("Aligned", "Uitgelijnd", None, True),
+                    NikoBinaryDescription("Aligned", "Aligned", None, True),
                 )
             )
         status_property = {
-            "generic": ("StartActive", "Actief"),
-            "condition": ("BasicState", "Voorwaarde waar"),
-            "timeschedule": ("Active", "Actief"),
+            "generic": ("StartActive", "Active"),
+            "condition": ("BasicState", "Condition true"),
+            "timeschedule": ("Active", "Active"),
         }.get(device.model)
         if status_property is not None and status_property[0] in device.properties:
             discovered.append(
                 (device, NikoBinaryDescription(status_property[0], status_property[1]))
             )
         for property_name, name, device_class, on_values in (
-            ("CallPending", "Oproep actief", "sound", ("true", "on", "1")),
-            ("CallAnswered", "Oproep beantwoord", None, ("true", "on", "1")),
-            ("Doorlock", "Deur ontgrendeld", "lock", ("open",)),
-            ("AllOffActive", "Alles-uit actief", None, ("true", "on", "1")),
+            ("CallPending", "Call active", "sound", ("true", "on", "1")),
+            ("CallAnswered", "Call answered", None, ("true", "on", "1")),
+            ("Doorlock", "Door unlocked", "lock", ("open",)),
+            ("AllOffActive", "All-off active", None, ("true", "on", "1")),
         ):
             if property_name in device.properties:
                 discovered.append(
@@ -468,7 +468,11 @@ def discover_binary_statuses(
                 (
                     device,
                     NikoBinaryDescription(
-                        "CouplingStatus", "Partnerverbinding", "connectivity", True, ("ok",)
+                        "CouplingStatus",
+                        "Partner connection",
+                        "connectivity",
+                        True,
+                        ("ok",),
                     ),
                 )
             )
@@ -479,7 +483,7 @@ def discover_binary_statuses(
                         device,
                         NikoBinaryDescription(
                             property_name,
-                            f"Deurbel {property_name.removeprefix('CallStatus')}",
+                            f"Doorbell {property_name.removeprefix('CallStatus')}",
                             "sound",
                             False,
                             ("ringing", "active"),

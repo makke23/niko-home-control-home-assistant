@@ -11,15 +11,15 @@ $dashboardDestination = Join-Path `
 $configurationPath = Join-Path $HomeAssistantConfig "configuration.yaml"
 
 if (-not (Test-Path -LiteralPath $HomeAssistantConfig)) {
-    throw "De Home Assistant-configuratiemap is niet bereikbaar: $HomeAssistantConfig"
+    throw "The Home Assistant configuration directory is not accessible: $HomeAssistantConfig"
 }
 
 if (-not (Test-Path -LiteralPath $dashboardSource)) {
-    throw "Het Niko-energiedashboard ontbreekt: $dashboardSource"
+    throw "The Niko Energy dashboard template is missing: $dashboardSource"
 }
 
 if (-not (Test-Path -LiteralPath $configurationPath)) {
-    throw "configuration.yaml ontbreekt in $HomeAssistantConfig"
+    throw "configuration.yaml is missing from $HomeAssistantConfig"
 }
 
 $dashboard = Get-Content -LiteralPath $dashboardSource -Raw
@@ -41,7 +41,7 @@ if (Test-Path -LiteralPath $entityRegistryPath) {
         )
     }
     catch {
-        Write-Warning "De Home Assistant-entiteitslijst kon niet worden gelezen. Standaardnamen worden gebruikt."
+        Write-Warning "The Home Assistant entity registry could not be read. Default entity IDs will be used."
     }
 }
 
@@ -59,7 +59,7 @@ if (Test-Path -LiteralPath $deviceRegistryPath) {
         }
     }
     catch {
-        Write-Warning "De Home Assistant-apparatenlijst kon niet worden gelezen."
+        Write-Warning "The Home Assistant device registry could not be read."
     }
 }
 
@@ -147,24 +147,24 @@ if ($smartPlugPowerEntities.Count -eq 0) {
     $smartPlugLiveBlock = @"
           - type: markdown
             content: >-
-              Er zijn nog geen slimme-stopcontactmetingen gevonden. Herstart
-              Home Assistant en voer het deployscript daarna nogmaals uit.
+              No smart-plug measurements were found. Restart Home Assistant
+              and run the deployment script again.
 "@
     $smartPlugGraphBlock = @"
           - type: markdown
-            content: Geen stopcontactgeschiedenis beschikbaar.
+            content: No smart-plug history is available.
 "@
 }
 else {
     $liveLines = [System.Collections.Generic.List[string]]::new()
     $liveLines.Add("          - type: entities")
-    $liveLines.Add("            title: Actueel vermogen")
+    $liveLines.Add("            title: Live power")
     $liveLines.Add("            show_header_toggle: false")
     $liveLines.Add("            entities:")
 
     $historyLines = [System.Collections.Generic.List[string]]::new()
     $historyLines.Add("          - type: history-graph")
-    $historyLines.Add("            title: Vermogen - laatste 24 uur")
+    $historyLines.Add("            title: Power - last 24 hours")
     $historyLines.Add("            hours_to_show: 24")
     $historyLines.Add("            entities:")
 
@@ -175,7 +175,7 @@ else {
         if ([string]::IsNullOrWhiteSpace($displayName)) {
             $displayName = [string]$powerEntity.entity_id
         }
-        $displayName = $displayName -replace "\s+Vermogen$", ""
+        $displayName = $displayName -replace "\s+(?:Power|Vermogen)$", ""
         $yamlName = $displayName.Replace("'", "''")
 
         $liveLines.Add("              - entity: $($powerEntity.entity_id)")
@@ -192,7 +192,7 @@ else {
         $graphLines.Add("            chart_type: bar")
         $graphLines.Add("            entities:")
         $graphLines.Add("              - entity: $($energyEntity.entity_id)")
-        $graphLines.Add("                name: Verbruik")
+        $graphLines.Add("                name: Consumption")
         $graphLines.Add("            stat_types:")
         $graphLines.Add("              - change")
         $graphLines.Add("            energy_date_selection: true")
@@ -205,7 +205,7 @@ else {
     if ($graphLines.Count -eq 0) {
         $smartPlugGraphBlock = @"
           - type: markdown
-            content: Er zijn nog geen energietotalen voor de stopcontacten beschikbaar.
+            content: No energy totals are available for the smart plugs yet.
 "@
     }
     else {
@@ -253,18 +253,18 @@ if ($waterEntities.Count -gt 0) {
     $optionalViewLines.Add("            collection_key: energy_niko_water")
     $optionalViewLines.Add("          - type: statistic")
     $optionalViewLines.Add("            entity: $($waterEntities[0].entity_id)")
-    $optionalViewLines.Add("            name: Waterverbruik in periode")
+    $optionalViewLines.Add("            name: Water consumption in period")
     $optionalViewLines.Add("            icon: mdi:water")
     $optionalViewLines.Add("            unit: m³")
     $optionalViewLines.Add("            stat_type: change")
     $optionalViewLines.Add("            period: energy_date_selection")
     $optionalViewLines.Add("            collection_key: energy_niko_water")
     $optionalViewLines.Add("          - type: statistics-graph")
-    $optionalViewLines.Add("            title: Waterverbruik")
+    $optionalViewLines.Add("            title: Water consumption")
     $optionalViewLines.Add("            chart_type: bar")
     $optionalViewLines.Add("            entities:")
     foreach ($waterEntity in $waterEntities) {
-        $name = Get-NikoDisplayName $waterEntity "\s+Waterverbruik totaal$"
+        $name = Get-NikoDisplayName $waterEntity "\s+(?:Total water consumption|Waterverbruik totaal)$"
         $optionalViewLines.Add("              - entity: $($waterEntity.entity_id)")
         $optionalViewLines.Add("                name: '$name'")
     }
@@ -295,18 +295,18 @@ if ($gasEntities.Count -gt 0) {
     $optionalViewLines.Add("            collection_key: energy_niko_gas")
     $optionalViewLines.Add("          - type: statistic")
     $optionalViewLines.Add("            entity: $($gasEntities[0].entity_id)")
-    $optionalViewLines.Add("            name: Gasverbruik in periode")
+    $optionalViewLines.Add("            name: Gas consumption in period")
     $optionalViewLines.Add("            icon: mdi:meter-gas")
     $optionalViewLines.Add("            unit: m³")
     $optionalViewLines.Add("            stat_type: change")
     $optionalViewLines.Add("            period: energy_date_selection")
     $optionalViewLines.Add("            collection_key: energy_niko_gas")
     $optionalViewLines.Add("          - type: statistics-graph")
-    $optionalViewLines.Add("            title: Gasverbruik")
+    $optionalViewLines.Add("            title: Gas consumption")
     $optionalViewLines.Add("            chart_type: bar")
     $optionalViewLines.Add("            entities:")
     foreach ($gasEntity in $gasEntities) {
-        $name = Get-NikoDisplayName $gasEntity "\s+Gasverbruik totaal$"
+        $name = Get-NikoDisplayName $gasEntity "\s+(?:Total gas consumption|Gasverbruik totaal)$"
         $optionalViewLines.Add("              - entity: $($gasEntity.entity_id)")
         $optionalViewLines.Add("                name: '$name'")
     }
@@ -326,8 +326,8 @@ $solarEntities = @(
         Sort-Object entity_id
 )
 if ($solarEntities.Count -gt 0) {
-    $optionalViewLines.Add("  - title: Zonne-energie")
-    $optionalViewLines.Add("    path: zonne-energie")
+    $optionalViewLines.Add("  - title: Solar energy")
+    $optionalViewLines.Add("    path: solar-energy")
     $optionalViewLines.Add("    icon: mdi:solar-power")
     $optionalViewLines.Add("    panel: true")
     $optionalViewLines.Add("    cards:")
@@ -337,18 +337,18 @@ if ($solarEntities.Count -gt 0) {
     $optionalViewLines.Add("            collection_key: energy_niko_solar")
     $optionalViewLines.Add("          - type: statistic")
     $optionalViewLines.Add("            entity: $($solarEntities[0].entity_id)")
-    $optionalViewLines.Add("            name: Productie in periode")
+    $optionalViewLines.Add("            name: Production in period")
     $optionalViewLines.Add("            icon: mdi:solar-power")
     $optionalViewLines.Add("            unit: kWh")
     $optionalViewLines.Add("            stat_type: change")
     $optionalViewLines.Add("            period: energy_date_selection")
     $optionalViewLines.Add("            collection_key: energy_niko_solar")
     $optionalViewLines.Add("          - type: statistics-graph")
-    $optionalViewLines.Add("            title: Zonneproductie")
+    $optionalViewLines.Add("            title: Solar production")
     $optionalViewLines.Add("            chart_type: bar")
     $optionalViewLines.Add("            entities:")
     foreach ($solarEntity in $solarEntities) {
-        $name = Get-NikoDisplayName $solarEntity "\s+Productie totaal$"
+        $name = Get-NikoDisplayName $solarEntity "\s+(?:Total production|Productie totaal)$"
         $optionalViewLines.Add("              - entity: $($solarEntity.entity_id)")
         $optionalViewLines.Add("                name: '$name'")
     }
@@ -385,8 +385,8 @@ if ($batteryEnergyEntities.Count -gt 0) {
             Sort-Object entity_id
     )
 
-    $optionalViewLines.Add("  - title: Batterij")
-    $optionalViewLines.Add("    path: batterij")
+    $optionalViewLines.Add("  - title: Battery")
+    $optionalViewLines.Add("    path: battery")
     $optionalViewLines.Add("    icon: mdi:home-battery")
     $optionalViewLines.Add("    panel: true")
     $optionalViewLines.Add("    cards:")
@@ -394,11 +394,11 @@ if ($batteryEnergyEntities.Count -gt 0) {
     $optionalViewLines.Add("        cards:")
     if ($batteryPowerEntities.Count -gt 0) {
         $optionalViewLines.Add("          - type: entities")
-        $optionalViewLines.Add("            title: Actueel batterijvermogen")
+        $optionalViewLines.Add("            title: Live battery power")
         $optionalViewLines.Add("            show_header_toggle: false")
         $optionalViewLines.Add("            entities:")
         foreach ($powerEntity in $batteryPowerEntities) {
-            $name = Get-NikoDisplayName $powerEntity "\s+Vermogen$"
+            $name = Get-NikoDisplayName $powerEntity "\s+(?:Power|Vermogen)$"
             $optionalViewLines.Add("              - entity: $($powerEntity.entity_id)")
             $optionalViewLines.Add("                name: '$name'")
         }
@@ -406,20 +406,20 @@ if ($batteryEnergyEntities.Count -gt 0) {
     $optionalViewLines.Add("          - type: energy-date-selection")
     $optionalViewLines.Add("            collection_key: energy_niko_battery")
     $optionalViewLines.Add("          - type: statistics-graph")
-    $optionalViewLines.Add("            title: Laden en ontladen")
+    $optionalViewLines.Add("            title: Charging and discharging")
     $optionalViewLines.Add("            chart_type: bar")
     $optionalViewLines.Add("            entities:")
     foreach ($batteryEntity in $batteryEnergyEntities) {
         $deviceName = Get-NikoDisplayName `
             $batteryEntity `
-            "\s+Batterij (?:geladen|ontladen) totaal$"
+            "\s+(?:Total battery (?:charge|discharge)|Batterij (?:geladen|ontladen) totaal)$"
         $direction = if (
             $batteryEntity.unique_id -like "*_ElectricalEnergyCharged_total"
         ) {
-            "Laden"
+            "Charging"
         }
         else {
-            "Ontladen"
+            "Discharging"
         }
         $optionalViewLines.Add("              - entity: $($batteryEntity.entity_id)")
         $optionalViewLines.Add("                name: '$deviceName - $direction'")
@@ -462,8 +462,8 @@ if ($chargerDeviceKeys.Count -gt 0) {
             }
     )
 
-    $optionalViewLines.Add("  - title: Laadpaal")
-    $optionalViewLines.Add("    path: laadpaal")
+    $optionalViewLines.Add("  - title: EV charging")
+    $optionalViewLines.Add("    path: ev-charging")
     $optionalViewLines.Add("    icon: mdi:ev-station")
     $optionalViewLines.Add("    panel: true")
     $optionalViewLines.Add("    cards:")
@@ -471,7 +471,7 @@ if ($chargerDeviceKeys.Count -gt 0) {
     $optionalViewLines.Add("        cards:")
     if ($chargerStatusEntities.Count -gt 0) {
         $optionalViewLines.Add("          - type: entities")
-        $optionalViewLines.Add("            title: Laadpaalstatus en bediening")
+        $optionalViewLines.Add("            title: Charger status and controls")
         $optionalViewLines.Add("            show_header_toggle: false")
         $optionalViewLines.Add("            entities:")
         foreach ($entity in $chargerStatusEntities) {
@@ -482,11 +482,11 @@ if ($chargerDeviceKeys.Count -gt 0) {
     }
     if ($chargerPowerEntities.Count -gt 0) {
         $optionalViewLines.Add("          - type: history-graph")
-        $optionalViewLines.Add("            title: Laadvermogen - laatste 24 uur")
+        $optionalViewLines.Add("            title: Charging power - last 24 hours")
         $optionalViewLines.Add("            hours_to_show: 24")
         $optionalViewLines.Add("            entities:")
         foreach ($entity in $chargerPowerEntities) {
-            $name = Get-NikoDisplayName $entity "\s+Vermogen$"
+            $name = Get-NikoDisplayName $entity "\s+(?:Power|Vermogen)$"
             $optionalViewLines.Add("              - entity: $($entity.entity_id)")
             $optionalViewLines.Add("                name: '$name'")
         }
@@ -495,11 +495,11 @@ if ($chargerDeviceKeys.Count -gt 0) {
         $optionalViewLines.Add("          - type: energy-date-selection")
         $optionalViewLines.Add("            collection_key: energy_niko_chargers")
         $optionalViewLines.Add("          - type: statistics-graph")
-        $optionalViewLines.Add("            title: Geladen energie")
+        $optionalViewLines.Add("            title: Charged energy")
         $optionalViewLines.Add("            chart_type: bar")
         $optionalViewLines.Add("            entities:")
         foreach ($entity in $chargerEnergyEntities) {
-            $name = Get-NikoDisplayName $entity "\s+Energie totaal$"
+            $name = Get-NikoDisplayName $entity "\s+(?:Total energy|Energie totaal)$"
             $optionalViewLines.Add("              - entity: $($entity.entity_id)")
             $optionalViewLines.Add("                name: '$name'")
         }
@@ -518,8 +518,8 @@ $climateEntities = @(
         Sort-Object entity_id
 )
 if ($climateEntities.Count -gt 0) {
-    $optionalViewLines.Add("  - title: Klimaat")
-    $optionalViewLines.Add("    path: klimaat")
+    $optionalViewLines.Add("  - title: Climate")
+    $optionalViewLines.Add("    path: climate")
     $optionalViewLines.Add("    icon: mdi:home-thermometer")
     $optionalViewLines.Add("    panel: true")
     $optionalViewLines.Add("    cards:")
@@ -550,7 +550,7 @@ if ($climateEntities.Count -gt 0) {
         if ($temperatureEntities.Count -gt 0) {
             $climateName = Get-NikoDisplayName $climateEntity "^$"
             $optionalViewLines.Add("          - type: history-graph")
-            $optionalViewLines.Add("            title: '$climateName - temperatuur'")
+            $optionalViewLines.Add("            title: '$climateName - temperature'")
             $optionalViewLines.Add("            hours_to_show: 24")
             $optionalViewLines.Add("            entities:")
             foreach ($entity in $temperatureEntities) {
@@ -571,7 +571,7 @@ if ($climateEntities.Count -gt 0) {
         if ($humidityEntities.Count -gt 0) {
             $climateName = Get-NikoDisplayName $climateEntity "^$"
             $optionalViewLines.Add("          - type: history-graph")
-            $optionalViewLines.Add("            title: '$climateName - luchtvochtigheid'")
+            $optionalViewLines.Add("            title: '$climateName - humidity'")
             $optionalViewLines.Add("            hours_to_show: 24")
             $optionalViewLines.Add("            entities:")
             foreach ($entity in $humidityEntities) {
@@ -601,8 +601,8 @@ Get-Content -LiteralPath $configurationPath | ForEach-Object {
 }
 
 if ($lines -match '^    niko-energy:\s*(?:#.*)?$') {
-    Write-Host "Niko Energie-dashboard was al geregistreerd."
-    Write-Host "Dashboardbestand is bijgewerkt: $dashboardDestination"
+    Write-Host "The Niko Energy dashboard was already registered."
+    Write-Host "Dashboard file updated: $dashboardDestination"
     exit 0
 }
 
@@ -618,7 +618,7 @@ $dashboardRegistration = [string[]]@(
     '    niko-energy:',
     '      mode: yaml',
     '      filename: niko_energy_dashboard.yaml',
-    '      title: Niko Energie',
+    '      title: Niko Energy',
     '      icon: mdi:lightning-bolt',
     '      show_in_sidebar: true',
     '      require_admin: false'
@@ -667,7 +667,7 @@ Copy-Item -LiteralPath $configurationPath -Destination $backupPath -Force
 [System.IO.File]::WriteAllLines($configurationPath, $lines, $utf8WithoutBom)
 
 Write-Host ""
-Write-Host "Niko Energie-dashboard geïnstalleerd."
-Write-Host "Dashboardbestand: $dashboardDestination"
-Write-Host "Configuratieback-up: $backupPath"
-Write-Host "Na een configuratiecontrole is één herstart van Home Assistant nodig."
+Write-Host "Niko Energy dashboard installed."
+Write-Host "Dashboard file: $dashboardDestination"
+Write-Host "Configuration backup: $backupPath"
+Write-Host "Validate the configuration, then restart Home Assistant once."

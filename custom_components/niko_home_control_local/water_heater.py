@@ -70,5 +70,5 @@ class NikoHotWater(NikoDeviceEntity, WaterHeaterEntity):
 
     async def async_set_operation_mode(self, operation_mode: str) -> None:
         if operation_mode not in _PROGRAMS:
-            raise ValueError(f"Niet-ondersteund warmwaterprogramma: {operation_mode}")
+            raise ValueError(f"Unsupported hot-water program: {operation_mode}")
         await self.hub.async_control_device(self.device.uuid, {"Program": operation_mode})

@@ -55,7 +55,7 @@ class NikoDoorUnlockButton(NikoDeviceEntity, ButtonEntity):
     def __init__(self, hub: NikoHub, device: NikoDevice) -> None:
         super().__init__(hub, device)
         self._attr_unique_id = f"{device.uuid}_door_unlock"
-        self._attr_name = f"{device.name} deur openen"
+        self._attr_name = f"{device.name} open door"
 
     async def async_press(self) -> None:
         await self.hub.async_control_device(
