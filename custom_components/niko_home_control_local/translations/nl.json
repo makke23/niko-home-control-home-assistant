@@ -1,0 +1,65 @@
+{
+  "title": "Niko Home Control II",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Verbinden met Niko Home Control II",
+        "description": "Maak rechtstreeks verbinding met de lokale Niko Hobby API.",
+        "data": {
+          "host": "IP-adres of hostnaam",
+          "port": "MQTT TLS-poort",
+          "username": "Gebruikersnaam",
+          "token": "Hobby API-token"
+        }
+      },
+      "reconfigure": {
+        "title": "Niko Home Control II-toegangsgegevens bijwerken",
+        "description": "Voer een geldig Hobby API-token in. De verbinding wordt getest voordat de integratie wordt bijgewerkt.",
+        "data": {
+          "username": "Gebruikersnaam",
+          "token": "Nieuw Hobby API-token"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Kan geen verbinding maken met de Niko-controller.",
+      "invalid_auth": "De gebruikersnaam of het Hobby API-token werd geweigerd.",
+      "unknown": "Er trad een onverwachte fout op. Controleer de Home Assistant-logboeken."
+    },
+    "abort": {
+      "already_configured": "Deze Niko-controller is al geconfigureerd.",
+      "reconfigure_successful": "De toegangsgegevens zijn bijgewerkt."
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "connected": {
+        "name": "Verbinding"
+      }
+    },
+    "sensor": {
+      "device_count": {
+        "name": "Aantal apparaten"
+      },
+      "token_expiry": {
+        "name": "Hobby API-token vervalt"
+      },
+      "history_import": {
+        "name": "Historische meetgegevens importeren",
+        "state": {
+          "pending": "Wachtend",
+          "running": "Bezig met importeren",
+          "completed": "Voltooid",
+          "partial": "Gedeeltelijk voltooid",
+          "failed": "Mislukt",
+          "not_applicable": "Niet van toepassing"
+        }
+      }
+    },
+    "event": {
+      "notification": {
+        "name": "Melding"
+      }
+    }
+  }
+}

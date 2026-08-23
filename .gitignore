@@ -1,0 +1,37 @@
+# Python and test environments
+env/
+env1/
+.venv/
+venv/
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+.dashboard-installer-test/
+*.py[cod]
+
+# Visual Studio and local IDE state
+.vs/
+*.pyproj
+*.pyproj.user
+*.slnx
+*.suo
+
+# Secrets and machine-specific configuration
+.env
+.env.*
+!.env.example
+debug_config*.json
+!debug_config.example.json
+secrets.yaml
+configuration.yaml
+.storage/
+*.token
+*.key
+*.pem
+
+# Home Assistant runtime files and local backups
+home-assistant.log*
+*.db
+*.db-shm
+*.db-wal
+*.niko-dashboard-backup

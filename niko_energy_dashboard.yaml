@@ -1,0 +1,109 @@
+title: Niko Energie
+views:
+  - title: Elektriciteit
+    path: elektriciteit
+    icon: mdi:lightning-bolt
+    panel: true
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: sensor
+                entity: __NIKO_NET_FROM_GRID_POWER__
+                name: Van het net
+                icon: mdi:transmission-tower-import
+              - type: sensor
+                entity: __NIKO_NET_TO_GRID_POWER__
+                name: Naar het net
+                icon: mdi:transmission-tower-export
+              - type: sensor
+                entity: __NIKO_MONTHLY_PEAK__
+                name: Maandpiek
+                icon: mdi:chart-bell-curve-cumulative
+
+          - type: history-graph
+            title: Actueel netvermogen - laatste 24 uur
+            hours_to_show: 24
+            entities:
+              - entity: __NIKO_NET_FROM_GRID_POWER__
+                name: Van het net
+              - entity: __NIKO_NET_TO_GRID_POWER__
+                name: Naar het net
+
+          - type: statistics-graph
+            title: Maandpiek - laatste 30 dagen
+            chart_type: line
+            days_to_show: 30
+            period: day
+            entities:
+              - entity: __NIKO_MONTHLY_PEAK__
+                name: Maandpiek
+            stat_types:
+              - max
+            min_y_axis: 0
+            fit_y_data: true
+
+          - type: energy-date-selection
+            collection_key: energy_niko
+
+          - type: horizontal-stack
+            cards:
+              - type: statistic
+                entity: __NIKO_GRID_IMPORT_TOTAL__
+                name: Verbruik in periode
+                icon: mdi:transmission-tower-import
+                unit: kWh
+                stat_type: change
+                period: energy_date_selection
+                collection_key: energy_niko
+              - type: statistic
+                entity: __NIKO_GRID_EXPORT_TOTAL__
+                name: Injectie in periode
+                icon: mdi:transmission-tower-export
+                unit: kWh
+                stat_type: change
+                period: energy_date_selection
+                collection_key: energy_niko
+
+          - type: statistics-graph
+            title: Verbruik en injectie
+            chart_type: bar
+            entities:
+              - entity: __NIKO_GRID_IMPORT_TOTAL__
+                name: Verbruik
+                color: "#6b7280"
+              - entity: __NIKO_GRID_EXPORT_TOTAL__
+                name: Injectie
+                color: "#22a06b"
+            stat_types:
+              - change
+            energy_date_selection: true
+            collection_key: energy_niko
+            min_y_axis: 0
+            fit_y_data: true
+            expand_legend: true
+
+  - title: Slimme stopcontacten
+    path: slimme-stopcontacten
+    icon: mdi:power-socket-eu
+    panel: true
+    cards:
+      - type: vertical-stack
+        cards:
+          # __NIKO_SMART_PLUG_LIVE__
+
+          - type: energy-date-selection
+            collection_key: energy_niko_smart_plugs
+
+          # __NIKO_SMART_PLUG_GRAPHS__
+
+          - type: markdown
+            content: >-
+              De gekozen periode geldt voor alle stopcontactgrafieken. De
+              grafieken gebruiken de historische gegevens van Niko Home
+              Control II, ontwikkeld door Maarten Moortgat.
+
+  # __NIKO_OPTIONAL_VIEWS__

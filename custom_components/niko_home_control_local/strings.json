@@ -1,0 +1,65 @@
+{
+  "title": "Niko Home Control II",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Niko Home Control II",
+        "description": "Connect directly to the local Niko Hobby API.",
+        "data": {
+          "host": "IP address or hostname",
+          "port": "MQTT TLS port",
+          "username": "Username",
+          "token": "Hobby API token"
+        }
+      },
+      "reconfigure": {
+        "title": "Update Niko Home Control II credentials",
+        "description": "Enter a current Hobby API token. The connection is tested before the integration is updated.",
+        "data": {
+          "username": "Username",
+          "token": "New Hobby API token"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Unable to connect to the Niko controller.",
+      "invalid_auth": "The username or Hobby API token was rejected.",
+      "unknown": "An unexpected error occurred. Check the Home Assistant logs."
+    },
+    "abort": {
+      "already_configured": "This Niko controller is already configured.",
+      "reconfigure_successful": "The credentials were updated successfully."
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "connected": {
+        "name": "Connection"
+      }
+    },
+    "sensor": {
+      "device_count": {
+        "name": "Device count"
+      },
+      "token_expiry": {
+        "name": "Hobby API token expires"
+      },
+      "history_import": {
+        "name": "Historical measurement import",
+        "state": {
+          "pending": "Pending",
+          "running": "Importing",
+          "completed": "Completed",
+          "partial": "Partially completed",
+          "failed": "Failed",
+          "not_applicable": "Not applicable"
+        }
+      }
+    },
+    "event": {
+      "notification": {
+        "name": "Notification"
+      }
+    }
+  }
+}
