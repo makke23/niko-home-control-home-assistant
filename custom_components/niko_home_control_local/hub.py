@@ -9,11 +9,13 @@ from dataclasses import dataclass
 import logging
 from typing import Any
 
+from .const import LIVE_POWER_PROPERTIES
 from .niko_client import NikoClient, NikoError
 from .measurements import NikoMeasurement, NikoMeasurementsClient, NikoMeasurementsError
 
 _LOGGER = logging.getLogger(__name__)
 _INSTANT_USAGE_REFRESH_SECONDS = 25
+_INSTANT_USAGE_STALE_SECONDS = 90
 _MEASUREMENT_REFRESH_SECONDS = 300
 _MEASUREMENT_DEVICE_TYPES = {
     "centralmeter",
@@ -188,23 +190,42 @@ class NikoHub:
 
     def _instant_usage_devices(self) -> list[str]:
         device_uuids: list[str] = []
-        power_properties = {
-            "ElectricalPower",
-            "ElectricalPowerFromGrid",
-            "ElectricalPowerToGrid",
-        }
         for device in self.client.devices.values():
             definition = device.property_definitions.get("ReportInstantUsage")
-            has_live_power = not power_properties.isdisjoint(device.properties)
+            has_live_power = not LIVE_POWER_PROPERTIES.isdisjoint(device.properties)
             if has_live_power and definition is not None and definition.can_control:
                 device_uuids.append(device.uuid)
         return device_uuids
+
+    def live_power_available(self, device_uuid: str) -> bool:
+        """Return whether a device's live power stream is current."""
+
+        if not self.connected:
+            return False
+        age = self.client.live_power_age(device_uuid)
+        return age is not None and age <= _INSTANT_USAGE_STALE_SECONDS
 
     async def _async_keep_instant_usage_enabled(self) -> None:
         while True:
             device_uuids = self._instant_usage_devices()
             if device_uuids:
                 try:
+                    stale_devices = [
+                        device_uuid
+                        for device_uuid in device_uuids
+                        if (age := self.client.live_power_age(device_uuid)) is None
+                        or age > _INSTANT_USAGE_STALE_SECONDS
+                    ]
+                    if stale_devices:
+                        # Force a state transition in the controller. Sending
+                        # True repeatedly is not sufficient on every firmware
+                        # version once its instant-usage stream has stalled.
+                        await self.client.async_control_devices(
+                            {
+                                device_uuid: {"ReportInstantUsage": "False"}
+                                for device_uuid in stale_devices
+                            }
+                        )
                     await self.client.async_control_devices(
                         {
                             device_uuid: {"ReportInstantUsage": "True"}
@@ -212,5 +233,5 @@ class NikoHub:
                         }
                     )
                 except NikoError as exc:
-                    _LOGGER.debug("Could not enable Niko instant usage: %s", exc)
+                    _LOGGER.warning("Could not enable Niko instant usage: %s", exc)
             await asyncio.sleep(_INSTANT_USAGE_REFRESH_SECONDS)

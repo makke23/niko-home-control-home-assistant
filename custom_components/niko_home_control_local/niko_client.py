@@ -7,11 +7,13 @@ from collections.abc import Callable
 import json
 import logging
 import ssl
+import time
 from typing import Any
 
 from paho.mqtt import MQTTException
 import paho.mqtt.client as mqtt
 
+from .const import LIVE_POWER_PROPERTIES
 from .models import NikoDevice, NikoNotification, parse_devices_list, parse_notifications
 
 _LOGGER = logging.getLogger(__name__)
@@ -74,6 +76,7 @@ class NikoClient:
 
         self.devices: dict[str, NikoDevice] = {}
         self.notifications: dict[str, NikoNotification] = {}
+        self._last_live_power_update: dict[str, float] = {}
         self.connected = False
         self.last_error: str | None = None
 
@@ -99,6 +102,14 @@ class NikoClient:
         self._client.on_connect = self._on_connect
         self._client.on_disconnect = self._on_disconnect
         self._client.on_message = self._on_message
+
+    def live_power_age(self, device_uuid: str) -> float | None:
+        """Return seconds since a live power value was received."""
+
+        updated_at = self._last_live_power_update.get(device_uuid)
+        if updated_at is None:
+            return None
+        return max(0.0, time.monotonic() - updated_at)
 
     def add_listener(self, listener: Callable[[], None]) -> Callable[[], None]:
         """Register a callback executed in Home Assistant's event loop."""
@@ -477,7 +488,32 @@ class NikoClient:
         if error is not None:
             future.set_exception(error)
             return
-        self.devices = devices or {}
+        received = devices or {}
+        # Keep object identity stable. Home Assistant entities retain the
+        # NikoDevice object created during setup; replacing it after an MQTT
+        # reconnect would leave those entities permanently frozen.
+        for uuid, fresh in received.items():
+            current = self.devices.get(uuid)
+            if current is None:
+                self.devices[uuid] = fresh
+                if not LIVE_POWER_PROPERTIES.isdisjoint(fresh.properties):
+                    self._last_live_power_update[uuid] = time.monotonic()
+                continue
+            current.name = fresh.name
+            current.model = fresh.model
+            current.device_type = fresh.device_type
+            current.technology = fresh.technology
+            current.identifier = fresh.identifier
+            current.parameters.clear()
+            current.parameters.update(fresh.parameters)
+            current.properties.clear()
+            current.properties.update(fresh.properties)
+            current.property_definitions.clear()
+            current.property_definitions.update(fresh.property_definitions)
+            current.raw = fresh.raw
+        for uuid in set(self.devices) - set(received):
+            self.devices.pop(uuid, None)
+            self._last_live_power_update.pop(uuid, None)
         future.set_result(self.devices)
         self._notify_listeners()
 
@@ -496,9 +532,14 @@ class NikoClient:
                 device = self.devices.get(str(raw_device.get("Uuid") or ""))
                 if device is None:
                     continue
+                has_live_power = False
                 for raw_property in raw_device.get("Properties", []) or []:
                     if isinstance(raw_property, dict):
                         device.properties.update(raw_property)
+                        if not LIVE_POWER_PROPERTIES.isdisjoint(raw_property):
+                            has_live_power = True
+                if has_live_power:
+                    self._last_live_power_update[device.uuid] = time.monotonic()
         self._notify_listeners()
 
     def _schedule_notify(self) -> None:

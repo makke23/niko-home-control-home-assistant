@@ -219,3 +219,57 @@ def test_control_devices_batches_multiple_devices(
         ]
 
     asyncio.run(run_test())
+
+
+def test_device_refresh_preserves_existing_object_identity() -> None:
+    async def run_test() -> None:
+        client = _client()
+        loop = asyncio.get_running_loop()
+        original = NikoDevice(
+            uuid="energy-1",
+            name="Energy old",
+            properties={"ElectricalPowerToGrid": "54"},
+        )
+        client.devices[original.uuid] = original
+        client._devices_future = loop.create_future()
+
+        client._finish_devices(
+            {
+                "energy-1": NikoDevice(
+                    uuid="energy-1",
+                    name="Energy new",
+                    properties={"ElectricalPowerToGrid": "321"},
+                )
+            },
+            None,
+        )
+
+        assert client.devices["energy-1"] is original
+        assert original.name == "Energy new"
+        assert original.properties["ElectricalPowerToGrid"] == "321"
+        assert await client._devices_future is client.devices
+
+    asyncio.run(run_test())
+
+
+def test_live_power_age_is_updated_by_status_payload() -> None:
+    client = _client()
+    client.devices["energy-1"] = NikoDevice(uuid="energy-1", name="Energy")
+
+    client._apply_status_payload(
+        {
+            "Params": [
+                {
+                    "Devices": [
+                        {
+                            "Uuid": "energy-1",
+                            "Properties": [{"ElectricalPowerToGrid": "321"}],
+                        }
+                    ]
+                }
+            ]
+        }
+    )
+
+    assert client.live_power_age("energy-1") is not None
+    assert client.live_power_age("energy-1") < 1

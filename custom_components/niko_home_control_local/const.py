@@ -4,7 +4,7 @@ from __future__ import annotations
 
 DOMAIN = "niko_home_control_local"
 NAME = "Niko Home Control II"
-VERSION = "1.5.0"
+VERSION = "1.6.1"
 DEVELOPER = "Maarten Moortgat"
 
 DEFAULT_PORT = 8884
@@ -14,5 +14,13 @@ DEFAULT_CONNECT_TIMEOUT = 15.0
 DEFAULT_DEVICE_LIST_TIMEOUT = 15.0
 
 CONF_TOKEN = "token"
+
+LIVE_POWER_PROPERTIES = frozenset(
+    {
+        "ElectricalPower",
+        "ElectricalPowerFromGrid",
+        "ElectricalPowerToGrid",
+    }
+)
 
 PLATFORMS = ["binary_sensor", "cover", "light", "sensor", "switch"]

@@ -34,6 +34,7 @@ from .discovery import (
 )
 from .auth import token_expiration
 from .entity import NikoControllerEntity, NikoDeviceEntity
+from .const import LIVE_POWER_PROPERTIES
 from .hub import HistoricalImportRecord, NikoHub
 from .history import (
     async_fetch_complete_hourly_history,
@@ -171,6 +172,12 @@ class NikoPropertySensor(NikoDeviceEntity, SensorEntity):
         self._attr_native_unit_of_measurement = description.unit
         self._attr_device_class = SensorDeviceClass(description.device_class)
         self._attr_state_class = SensorStateClass(description.state_class)
+
+    @property
+    def available(self) -> bool:
+        if self.description.property_name in LIVE_POWER_PROPERTIES:
+            return self.hub.live_power_available(self.device.uuid)
+        return super().available
 
     @property
     def native_value(self) -> int | float | None:
