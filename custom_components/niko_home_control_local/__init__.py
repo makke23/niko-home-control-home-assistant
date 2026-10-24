@@ -15,20 +15,10 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
     from homeassistant.core import HomeAssistant
-    from homeassistant.helpers.typing import ConfigType
 
     from .hub import NikoHub
 
 _LOGGER = logging.getLogger(__name__)
-
-
-async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    """Set up shared integration resources."""
-
-    from .frontend import async_register_dashboard_strategy
-
-    await async_register_dashboard_strategy(hass)
-    return True
 
 
 async def _async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
@@ -46,8 +36,11 @@ async def async_setup_entry(
     from homeassistant.exceptions import ConfigEntryNotReady
 
     from .const import CONF_TOKEN, DEFAULT_CLIENT_ID_PREFIX
+    from .frontend import async_register_dashboard_strategy
     from .hub import NikoHub, NikoHubConfig
     from .niko_client import NikoCannotConnect, NikoError
+
+    await async_register_dashboard_strategy(hass)
 
     hub = NikoHub(
         NikoHubConfig(
