@@ -44,7 +44,7 @@ from .measurements import IntervalAccumulator, NikoMeasurementsError
 from .models import NikoDevice
 
 _LOGGER = logging.getLogger(__name__)
-_HISTORY_IMPORT_SCHEMA_VERSION = 3
+_HISTORY_IMPORT_SCHEMA_VERSION = 4
 
 
 async def async_setup_entry(

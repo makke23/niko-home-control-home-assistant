@@ -19,6 +19,7 @@ EARLIEST_HISTORY_YEAR = 2000
 HISTORY_CHUNK_DAYS = 60
 HISTORY_DAILY_CHUNK_DAYS = 90
 HISTORY_HOURLY_RETENTION_DAYS = 60
+HISTORY_RAW_CHUNK_DAYS = 7
 HISTORY_REQUEST_ATTEMPTS = 3
 HISTORY_RETRY_DELAY_SECONDS = 2
 
@@ -171,6 +172,38 @@ async def async_fetch_complete_hourly_history(
             )
         )
         history.extend(chunk)
+
+        # Some Niko properties expose daily aggregates and raw quarter-hour
+        # measurements, but return no hourly aggregates. Fetch the uncovered
+        # tail as raw measurements so recent export and water history is not
+        # silently lost.
+        raw_start = chunk_start
+        if chunk:
+            latest = max(
+                parse_niko_timestamp(item.timestamp, local_timezone)
+                for item in chunk
+            )
+            raw_start = max(
+                raw_start,
+                latest.replace(minute=0, second=0, microsecond=0)
+                + timedelta(hours=1),
+            )
+        raw_chunk_start = raw_start
+        while raw_chunk_start < chunk_end:
+            raw_chunk_end = min(
+                raw_chunk_start + timedelta(days=HISTORY_RAW_CHUNK_DAYS),
+                chunk_end,
+            )
+            raw_chunk = await _async_retry_history_request(
+                lambda: client.async_get_history(
+                    device_uuid,
+                    property_name,
+                    raw_chunk_start.replace(tzinfo=None).isoformat(),
+                    raw_chunk_end.replace(tzinfo=None).isoformat(),
+                )
+            )
+            history.extend(raw_chunk)
+            raw_chunk_start = raw_chunk_end
         chunk_start = chunk_end
 
     # Be defensive against overlapping chunk boundaries and controller retries.

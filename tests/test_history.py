@@ -68,6 +68,13 @@ def test_fetch_complete_history_discovers_oldest_year_and_deduplicates() -> None
                 ]
             return []
 
+        async def async_get_history(
+            self, device_uuid, property_name, interval_start, interval_end
+        ):
+            del device_uuid, property_name
+            self.calls.append(("raw", interval_start, interval_end))
+            return []
+
     client = Client()
     result = asyncio.run(
         async_fetch_complete_hourly_history(
@@ -93,6 +100,61 @@ def test_fetch_complete_history_discovers_oldest_year_and_deduplicates() -> None
         assert duration.days <= 60
 
 
+def test_fetch_complete_history_falls_back_to_raw_recent_intervals() -> None:
+    class Client:
+        def __init__(self) -> None:
+            self.raw_calls = []
+
+        async def async_get_aggregated_history(
+            self,
+            device_uuid,
+            property_name,
+            interval,
+            interval_start,
+            interval_end,
+            *,
+            aggregation="sum",
+        ):
+            del (
+                device_uuid,
+                property_name,
+                interval,
+                interval_start,
+                interval_end,
+                aggregation,
+            )
+            return []
+
+        async def async_get_history(
+            self, device_uuid, property_name, interval_start, interval_end
+        ):
+            del device_uuid, property_name
+            self.raw_calls.append((interval_start, interval_end))
+            if len(self.raw_calls) == 1:
+                return [
+                    NikoMeasurement(100, "Wh", "2026-08-23T00:15:00+00:00"),
+                    NikoMeasurement(200, "Wh", "2026-08-23T00:30:00+00:00"),
+                ]
+            return []
+
+    client = Client()
+    result = asyncio.run(
+        async_fetch_complete_hourly_history(
+            client,
+            "device",
+            "ElectricalEnergyToGrid",
+            now=datetime(2026, 8, 24, tzinfo=timezone.utc),
+            local_timezone=timezone.utc,
+        )
+    )
+
+    assert [measurement.value for measurement in result] == [100, 200]
+    assert client.raw_calls
+    for start, end in client.raw_calls:
+        duration = datetime.fromisoformat(end) - datetime.fromisoformat(start)
+        assert duration.days <= 7
+
+
 def test_fetch_complete_history_retries_transient_failure(monkeypatch) -> None:
     monkeypatch.setattr(
         "custom_components.niko_home_control_local.history.HISTORY_RETRY_DELAY_SECONDS",
@@ -112,6 +174,12 @@ def test_fetch_complete_history_retries_transient_failure(monkeypatch) -> None:
                 self.attempts += 1
                 if self.attempts < HISTORY_REQUEST_ATTEMPTS:
                     raise NikoMeasurementsError("temporary timeout")
+            return []
+
+        async def async_get_history(
+            self, device_uuid, property_name, interval_start, interval_end
+        ):
+            del device_uuid, property_name, interval_start, interval_end
             return []
 
     client = Client()

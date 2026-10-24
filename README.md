@@ -86,6 +86,11 @@ to the equipment exposed by the Niko installation. It does not edit
 
 ## Release history
 
+### 1.7.2
+
+- Added a raw quarter-hour fallback when the controller exposes recent measurements but no hourly aggregates.
+- Re-imported recent export and water statistics so period cards no longer show unknown values for retained dates.
+
 ### 1.7.1
 
 - Updated child-device linking for the Home Assistant 2026.8+ device-registry API.
