@@ -48,5 +48,9 @@ jobs:
         run: python -m pip install -r requirements-dev.txt
       - name: Run tests
         run: python -m pytest
+      - name: Validate dashboard strategy
+        run: |
+          node --check custom_components/niko_home_control_local/frontend/niko-energy-dashboard.js
+          node tests/dashboard_strategy.test.mjs
       - name: Compile Python sources
         run: python -m compileall -q custom_components tests debug_niko_connection.py

@@ -94,20 +94,11 @@ Destination: $destinationVersion
 "@
 }
 
-Write-Host "Installing the Niko Energy dashboard..."
-& (Join-Path $PSScriptRoot "install_energy_dashboard.ps1") `
-    -HomeAssistantConfig $HomeAssistantConfig
-
 Write-Host ""
 Write-Host "Deployment completed successfully."
 Write-Host "Validated version: $destinationVersion"
 Write-Host "Integration installed in:"
 Write-Host "  $destination"
 Write-Host ""
-if ($previousDestinationVersion -eq $sourceVersion) {
-    Write-Host "Only dashboard files were updated."
-    Write-Host "Refresh the Niko Energy dashboard; no restart is required."
-}
-else {
-    Write-Host "Validate the configuration and restart Home Assistant."
-}
+Write-Host "Validate the configuration and restart Home Assistant."
+Write-Host "The Niko Energy community dashboard is bundled with the integration."

@@ -1,6 +1,6 @@
 # Niko Home Control II for Home Assistant
 
-[![Version](https://img.shields.io/badge/version-1.6.0-blue.svg)](https://github.com/makke23/niko-home-control-home-assistant/releases)
+[![Version](https://img.shields.io/github/v/release/makke23/niko-home-control-home-assistant)](https://github.com/makke23/niko-home-control-home-assistant/releases)
 [![Validate](https://github.com/makke23/niko-home-control-home-assistant/actions/workflows/validate.yml/badge.svg)](https://github.com/makke23/niko-home-control-home-assistant/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -23,6 +23,8 @@ Niko Home Control are trademarks of their respective owner.
   installation exposes the corresponding capabilities.
 - Automatic import of retained Niko measurement history into Home Assistant
   long-term statistics.
+- A dynamic Niko Energy community dashboard for electricity, smart plugs,
+  water, gas, solar, batteries, EV chargers, and climate equipment.
 - English source text with Dutch and English setup-flow translations.
 - Privacy-safe diagnostics with credentials and identifying connection data
   removed.
@@ -38,22 +40,17 @@ for availability and token setup.
 
 ## Installation with HACS
 
-Until this repository is accepted into the default HACS catalogue, add it as a
-custom repository:
-
-1. Open **HACS → three-dot menu → Custom repositories**.
-2. Add `https://github.com/makke23/niko-home-control-home-assistant` and select
-   **Integration** as the category.
-3. Download **Niko Home Control II** and restart Home Assistant.
-4. Open **Settings → Devices & services → Add integration** and search for
+1. Open **HACS**, search for **Niko Home Control II**, and select **Download**.
+2. Restart Home Assistant.
+3. Open **Settings → Devices & services → Add integration** and search for
    **Niko Home Control II**.
-5. Enter the local controller address, MQTT TLS port, username, and Hobby API
+4. Enter the local controller address, MQTT TLS port, username, and Hobby API
    token.
 
 Do not run this integration alongside another integration using the `nhc2`
 domain for the same controller; that creates duplicate devices and entities.
 
-The request for inclusion in the default HACS catalogue is tracked in
+The integration is included in the default HACS catalogue through
 [hacs/default#10257](https://github.com/hacs/default/pull/10257).
 
 ## Niko Energy dashboard
@@ -61,23 +58,20 @@ The request for inclusion in the default HACS catalogue is tracked in
 The integration's energy and volume sensors work with Home Assistant's native
 Energy dashboard and long-term statistics without extra cards.
 
-This repository also contains an optional, dynamically generated **Niko
-Energy** YAML dashboard. HACS installs only the integration directory, so the
-dashboard companion is deliberately a separate manual installation:
+Home Assistant 2026.5 or newer can also create the bundled **Niko Energy**
+community dashboard:
 
-1. Download or clone this repository on a Windows computer that can access the
-   Home Assistant configuration directory through Samba.
-2. Run `install_energy_dashboard.ps1` from PowerShell.
-3. The installer backs up `configuration.yaml`, discovers entity IDs from the
-   Home Assistant registries, and writes `niko_energy_dashboard.yaml` into the
-   configuration directory.
-4. Validate the Home Assistant configuration and restart once when the
-   dashboard is first registered. Later dashboard refreshes do not require a
-   restart.
+1. Install and configure **Niko Home Control II**.
+2. Refresh the browser after Home Assistant has loaded the integration.
+3. Open **Settings → Dashboards → Add dashboard**.
+4. Select **Niko Energy** under **Community dashboards** and confirm the
+   suggested title and icon.
 
-The dashboard shows only sections for equipment actually discovered in Home
-Assistant. Never publish generated dashboards, registry files, diagnostics,
-logs, tokens, or `configuration.yaml` without reviewing and redacting them.
+The dashboard is generated at runtime from the Home Assistant entity and
+device registries. It automatically adds or removes the electricity,
+smart-plug, water, gas, solar, battery, EV-charging, and climate views according
+to the equipment exposed by the Niko installation. It does not edit
+`configuration.yaml`, require Samba, or copy a separate YAML file.
 
 ## Privacy and security
 
@@ -91,6 +85,26 @@ logs, tokens, or `configuration.yaml` without reviewing and redacting them.
   diagnostics.
 
 ## Release history
+
+### 1.7.0
+
+- Replaced the manual PowerShell/YAML dashboard installer with a community
+  dashboard strategy bundled with the HACS integration.
+- Added runtime discovery of Niko electricity, smart-plug, water, gas, solar,
+  battery, EV-charging, and climate entities in the dashboard.
+- Removed all dashboard changes to `configuration.yaml` and the need for Samba.
+- Synchronized the public version across the manifest, code, documentation,
+  and release metadata.
+
+### 1.6.2
+
+- Relaxed the MQTT dependency constraint so Home Assistant can select a
+  compatible `paho-mqtt` 2.x release.
+
+### 1.6.1
+
+- Restored live power updates automatically after an MQTT reconnect or a
+  stalled instant-usage stream.
 
 ### 1.6.0
 
@@ -173,7 +187,7 @@ The other anonymized probes are available through `--measurements`,
 
 ## Manual deployment
 
-Deploy through Samba:
+Deploy the integration through Samba:
 
 ```powershell
 .\deploy_to_homeassistant.ps1
@@ -191,8 +205,10 @@ to:
 /config/custom_components/niko_home_control_local
 ```
 
-Validate the Home Assistant configuration and restart Home Assistant. Then add
-**Niko Home Control II** under **Settings → Devices & services**.
+The dashboard strategy is contained in the integration directory and is copied
+by the same command. Validate the Home Assistant configuration and restart Home
+Assistant. Then add **Niko Home Control II** under
+**Settings → Devices & services**.
 
 ## Acceptance checklist
 
@@ -202,6 +218,8 @@ Validate the Home Assistant configuration and restart Home Assistant. Then add
 - The connection diagnostic is active.
 - Lights, switches, and covers respond correctly.
 - Measurement sensors update when Niko publishes new values.
+- Niko Energy appears under **Community dashboards** and only shows views for
+  discovered equipment.
 - Config-entry reload and Home Assistant restart reconnect cleanly.
 - Removing or unloading the integration leaves no MQTT thread running.
 

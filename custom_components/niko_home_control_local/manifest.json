@@ -6,6 +6,7 @@
   ],
   "config_flow": true,
   "dependencies": [
+    "frontend",
     "recorder"
   ],
   "documentation": "https://github.com/makke23/niko-home-control-home-assistant",
@@ -18,5 +19,5 @@
   "requirements": [
     "paho-mqtt>=2.1.0"
   ],
-  "version": "1.6.2"
+  "version": "1.7.0"
 }
