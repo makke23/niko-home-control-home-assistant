@@ -55,14 +55,16 @@ class NikoDeviceEntity(Entity):
 
     @property
     def device_info(self) -> DeviceInfo:
-        return DeviceInfo(
+        info = DeviceInfo(
             identifiers={(DOMAIN, self.device.uuid)},
             name=self.device.name,
             manufacturer="Niko",
             model=self.device.model or self.device.device_type,
             suggested_area=self.device.parameters.get("LocationName"),
-            via_device=(DOMAIN, self.hub.identifier),
         )
+        if self.hub.device_registry_id is not None:
+            info["via_device_id"] = self.hub.device_registry_id
+        return info
 
     async def async_added_to_hass(self) -> None:
         self.async_on_remove(self.hub.add_listener(self._handle_hub_update))

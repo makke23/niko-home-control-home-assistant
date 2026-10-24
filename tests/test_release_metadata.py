@@ -43,3 +43,14 @@ def test_legacy_dashboard_installer_is_removed() -> None:
 
     assert not (ROOT / "install_energy_dashboard.ps1").exists()
     assert not (ROOT / "niko_energy_dashboard.yaml").exists()
+
+
+def test_device_topology_uses_current_registry_api() -> None:
+    """Avoid the deprecated via_device field that blocks entity setup."""
+
+    entity_source = (INTEGRATION / "entity.py").read_text("utf-8")
+    setup_source = (INTEGRATION / "__init__.py").read_text("utf-8")
+
+    assert "via_device=" not in entity_source
+    assert 'info["via_device_id"]' in entity_source
+    assert "hub.device_registry_id = controller.id" in setup_source

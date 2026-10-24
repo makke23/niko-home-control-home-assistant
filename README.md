@@ -86,6 +86,11 @@ to the equipment exposed by the Niko installation. It does not edit
 
 ## Release history
 
+### 1.7.1
+
+- Updated child-device linking for the Home Assistant 2026.8+ device-registry API.
+- Prevented sensor setup failures caused by the deprecated `via_device` field.
+
 ### 1.7.0
 
 - Replaced the manual PowerShell/YAML dashboard installer with a community

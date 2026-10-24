@@ -4,7 +4,7 @@ from __future__ import annotations
 
 DOMAIN = "niko_home_control_local"
 NAME = "Niko Home Control II"
-VERSION = "1.7.0"
+VERSION = "1.7.1"
 DEVELOPER = "Maarten Moortgat"
 
 DEFAULT_PORT = 8884

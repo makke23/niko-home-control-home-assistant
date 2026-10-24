@@ -52,6 +52,7 @@ class NikoHub:
 
     def __init__(self, config: NikoHubConfig) -> None:
         self.config = config
+        self.device_registry_id: str | None = None
         self._instant_usage_task: asyncio.Task[None] | None = None
         self._measurement_task: asyncio.Task[None] | None = None
         self.measurements: dict[str, dict[str, NikoMeasurement]] = {}

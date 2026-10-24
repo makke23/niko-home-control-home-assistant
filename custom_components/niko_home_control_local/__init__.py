@@ -34,8 +34,9 @@ async def async_setup_entry(
 
     from homeassistant.const import CONF_HOST, CONF_PORT, CONF_USERNAME, Platform
     from homeassistant.exceptions import ConfigEntryNotReady
+    from homeassistant.helpers import device_registry as dr
 
-    from .const import CONF_TOKEN, DEFAULT_CLIENT_ID_PREFIX
+    from .const import CONF_TOKEN, DEFAULT_CLIENT_ID_PREFIX, DOMAIN
     from .frontend import async_register_dashboard_strategy
     from .hub import NikoHub, NikoHubConfig
     from .niko_client import NikoCannotConnect, NikoError
@@ -66,6 +67,16 @@ async def async_setup_entry(
             entry,
             title=f"Niko Home Control II ({entry.data[CONF_HOST]})",
         )
+
+    controller = dr.async_get(hass).async_get_or_create(
+        config_entry_id=entry.entry_id,
+        identifiers={(DOMAIN, hub.identifier)},
+        name="Niko Home Control II Controller",
+        manufacturer="Niko",
+        model="Connected Controller",
+        configuration_url=f"https://{hub.config.host}",
+    )
+    hub.device_registry_id = controller.id
 
     entry.async_on_unload(entry.add_update_listener(_async_reload_entry))
     entry.runtime_data = hub
